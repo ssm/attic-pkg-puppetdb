@@ -1,0 +1,9 @@
+[Unit]
+Description=Puppet data warehouse
+
+[Service]
+User=puppetdb
+Group=puppetdb
+WorkingDirectory=/usr/share/puppetdb
+ExecStart=/usr/bin/java -Xmx192m -jar puppetdb.jar services -c /etc/puppetdb/conf.d
+StandardOutput=syslog

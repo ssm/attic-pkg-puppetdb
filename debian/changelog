@@ -1,0 +1,5 @@
+puppetdb (0.9.0-1) UNRELEASED; urgency=low
+
+  * Initial debian release (Closes: #673515)
+
+ -- Stig Sandbeck Mathisen <ssm@debian.org>  Sat, 26 May 2012 11:26:57 +0200

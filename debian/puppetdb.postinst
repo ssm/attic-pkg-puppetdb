@@ -1,0 +1,56 @@
+#!/bin/bash
+
+set -e
+set -u
+
+setup_user() {
+   # Create the "puppetdb" user
+    if ! getent passwd puppetdb  > /dev/null; then
+        adduser --quiet --system --group --home /usr/share/puppetdb  \
+            --no-create-home                                 \
+            --gecos "Puppet Data Warehouse" \
+            puppetdb
+    fi
+
+    # Create the "puppetdb" group, if it is missing, and set the
+    # primary group of the "puppetdb" user to this group.
+    if ! getent group puppetdb > /dev/null; then
+        addgroup --quiet --system puppetdb
+        usermod -g puppetdb puppetdb
+    fi
+}
+
+configure_ssl() {
+    password_file="/etc/puppetdb/ssl/puppetdb_keystore_pw.txt"
+    jetty_configuration_file="/etc/puppetd/conf.d/jetty.ini"
+
+    if [ ! -f "${password_file}" ] ; then
+        /usr/sbin/puppetdb-ssl-setup
+
+        password=$(cat "${password_file}")
+
+        # TODO: figure out how to avoid configuration file change
+        # prompts.  ucf?
+        sed -i "s/%PASSWORD%/${password}/" "${jetty_configuration_file}"
+}
+
+# TODO: figure out real permissions. This is too generous.
+# Suspect something like this is proper:
+# - group puppetdb read access to /etc/puppetdb
+# - all read accses to /usr/share/puppetdb
+# - user write access to /var/lib/puppetdb
+# - user puppetdb write access and group adm read access to /var/log/puppetdb
+set_permissions() {
+    chown -R puppetdb:puppetdb /etc/puppetdb
+    chown -R puppetdb:puppetdb /usr/share/puppetdb
+    chown -R puppetdb:puppetdb /var/lib/puppetdb
+    chown -R puppetdb:puppetdb /var/log/puppetdb
+}
+
+case $1 in
+    "configure")
+        setup_user
+        configure_ssl
+        set_permissions
+        ;;
+esac

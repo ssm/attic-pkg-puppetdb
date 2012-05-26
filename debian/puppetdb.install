@@ -1,0 +1,8 @@
+debian/puppetdb.service /lib/systemd/system
+etc/puppetdb/conf.d
+etc/puppetdb/conf.d/../log4j.properties
+var/log/puppetdb
+usr/share/puppetdb
+usr/share/puppetdb
+usr/sbin
+var/lib/puppetdb
